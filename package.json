@@ -1,0 +1,42 @@
+{
+  "name": "ai-form-agent",
+  "version": "0.1.0",
+  "description": "CLI tool that uses Claude to generate React forms from Persian text descriptions",
+  "type": "module",
+  "bin": {
+    "ai-form-agent": "./dist/bin/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx bin/cli.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "cli",
+    "react",
+    "form",
+    "persian",
+    "ai",
+    "claude",
+    "anthropic",
+    "code-generation"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "commander": "^13.1.0",
+    "gray-matter": "^4.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

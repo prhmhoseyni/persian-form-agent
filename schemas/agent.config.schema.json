@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/prhmhoseyni/ai-form-agent/main/schemas/agent.config.schema.json",
+  "title": "AI Form Agent Configuration",
+  "description": "Configuration file for the ai-form-agent CLI tool",
+  "type": "object",
+  "required": ["paths", "validationLibrary", "cache", "reactPersianForm", "wizardComponent"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Path to this JSON Schema file for editor autocomplete"
+    },
+    "paths": {
+      "type": "object",
+      "description": "File system paths within the target project",
+      "required": ["formComponents", "formsOutput", "customValidators", "schemas"],
+      "properties": {
+        "formComponents": {
+          "type": "string",
+          "description": "Directory containing local form field components (e.g. src/components/form/fields)"
+        },
+        "formsOutput": {
+          "type": "string",
+          "description": "Directory where generated form files will be written (e.g. src/features/forms)"
+        },
+        "customValidators": {
+          "type": "string",
+          "description": "Path to custom Yup validator extensions file (e.g. src/utils/validation/yup-extensions.ts)"
+        },
+        "schemas": {
+          "type": "string",
+          "description": "Directory for generated form TypeScript interfaces/types (e.g. src/schemas)"
+        }
+      }
+    },
+    "validationLibrary": {
+      "type": "string",
+      "description": "Validation library to use (currently only 'yup' is supported)",
+      "enum": ["yup"]
+    },
+    "cache": {
+      "type": "object",
+      "description": "Cache configuration for react-persian-form file listings",
+      "required": ["path", "ttlHours"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "Path to the cache file relative to the project root (e.g. .cache/rpf-listing.json)"
+        },
+        "ttlHours": {
+          "type": "number",
+          "description": "How many hours before the cache is considered stale and refetched from GitHub",
+          "minimum": 1
+        }
+      }
+    },
+    "reactPersianForm": {
+      "type": "object",
+      "description": "Configuration for the react-persian-form component library source",
+      "required": ["repoOwner", "repoName", "ref", "paths"],
+      "properties": {
+        "repoOwner": {
+          "type": "string",
+          "description": "GitHub owner (org or user) of the react-persian-form repository"
+        },
+        "repoName": {
+          "type": "string",
+          "description": "GitHub repository name (e.g. react-persian-form)"
+        },
+        "ref": {
+          "type": "string",
+          "description": "Git ref (branch, tag, or commit SHA) to pin for fetching files"
+        },
+        "paths": {
+          "type": "object",
+          "description": "Subdirectories within the react-persian-form repo",
+          "required": ["components", "validators", "utils"],
+          "properties": {
+            "components": {
+              "type": "string",
+              "description": "Path to components directory in the react-persian-form repo"
+            },
+            "validators": {
+              "type": "string",
+              "description": "Path to validators directory in the react-persian-form repo"
+            },
+            "utils": {
+              "type": "string",
+              "description": "Path to utils directory in the react-persian-form repo"
+            }
+          }
+        }
+      }
+    },
+    "wizardComponent": {
+      "type": "object",
+      "description": "Import paths for the Wizard component used in multi-step forms",
+      "required": ["importPath", "typesImportPath"],
+      "properties": {
+        "importPath": {
+          "type": "string",
+          "description": "Import path for the Wizard component (e.g. ~/components/atoms/Wizard/Wizard)"
+        },
+        "typesImportPath": {
+          "type": "string",
+          "description": "Import path for Wizard types including WizardStepProps (e.g. ~/components/atoms/Wizard/Wizard.types)"
+        }
+      }
+    }
+  }
+}
