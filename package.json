@@ -1,10 +1,10 @@
 {
-  "name": "ai-form-agent",
+  "name": "persian-form-agent",
   "version": "0.1.0",
   "description": "CLI tool that uses Claude to generate React forms from Persian text descriptions",
   "type": "module",
   "bin": {
-    "ai-form-agent": "./dist/bin/cli.js"
+    "persian-form-agent": "./dist/bin/cli.js"
   },
   "scripts": {
     "build": "tsc",

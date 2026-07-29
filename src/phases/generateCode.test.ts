@@ -7,7 +7,7 @@ import type { AnalysisData } from "../types.js";
 import type { AgentConfig } from "./bootstrap.js";
 
 function createTmpDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "ai-form-agent-test-"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "persian-form-agent-test-"));
 }
 
 const BASE_CONFIG: AgentConfig = {

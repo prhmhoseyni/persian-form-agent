@@ -1,10 +1,10 @@
-# ai-form-agent
+# persian-form-agent
 
 CLI tool that uses Claude to generate React forms from Persian text descriptions.
 
 ## What it does
 
-Given a plain-text Persian description of a form, `ai-form-agent` produces:
+Given a plain-text Persian description of a form, `persian-form-agent` produces:
 
 - A fully generated React form component (single-step or multi-step wizard)
 - TypeScript interfaces for form data
@@ -25,7 +25,7 @@ Phase 3: Implement     → installs deps + generates code
 ## Install
 
 ```bash
-npx ai-form-agent init
+npx persian-form-agent init
 ```
 
 ## Usage
@@ -33,7 +33,7 @@ npx ai-form-agent init
 ### 1. Bootstrap your project
 
 ```bash
-npx ai-form-agent init
+npx persian-form-agent init
 ```
 
 Creates `agent.config.json` in your project root with paths and configuration.
@@ -52,7 +52,7 @@ cellphone با عنوان "شماره همراه" که ضروری است
 ### 3. Analyze
 
 ```bash
-npx ai-form-agent analyze --input task.txt
+npx persian-form-agent analyze --input task.txt
 ```
 
 Produces `task-{id}.analysis.md` — a structured, human-readable analysis file.
@@ -64,7 +64,7 @@ Open the `.analysis.md` file. Fix any `needs-decision` fields, set `overallStatu
 ### 5. Implement
 
 ```bash
-npx ai-form-agent implement task-123
+npx persian-form-agent implement task-123
 ```
 
 Installs needed components from react-persian-form and generates your form code.
@@ -75,7 +75,7 @@ Installs needed components from react-persian-form and generates your form code.
 
 ```json
 {
-  "$schema": "https://raw.githubusercontent.com/prhmhoseyni/ai-form-agent/main/schemas/agent.config.schema.json",
+  "$schema": "https://raw.githubusercontent.com/prhmhoseyni/persian-form-agent/main/schemas/agent.config.schema.json",
   "paths": {
     "formComponents": "src/components/form/fields",
     "formsOutput": "src/features/forms",

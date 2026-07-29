@@ -60,7 +60,7 @@ const DEFAULT_CONFIG: Omit<AgentConfig, "$schema"> = {
 };
 
 const SCHEMA_URL =
-  "https://raw.githubusercontent.com/prhmhoseyni/ai-form-agent/main/schemas/agent.config.schema.json";
+  "https://raw.githubusercontent.com/prhmhoseyni/persian-form-agent/main/schemas/agent.config.schema.json";
 
 function ensureGitignore(projectRoot: string): void {
   const gitignorePath = path.join(projectRoot, ".gitignore");

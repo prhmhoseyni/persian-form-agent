@@ -10,7 +10,7 @@ function loadConfig(projectRoot: string): AgentConfig {
   const configPath = path.join(projectRoot, "agent.config.json");
   if (!fs.existsSync(configPath)) {
     throw new Error(
-      "agent.config.json not found. Run `ai-form-agent init` first.",
+      "agent.config.json not found. Run `persian-form-agent init` first.",
     );
   }
   return JSON.parse(fs.readFileSync(configPath, "utf-8"));

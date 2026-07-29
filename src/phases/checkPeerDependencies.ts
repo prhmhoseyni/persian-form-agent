@@ -131,7 +131,7 @@ export async function checkPeerDependencies(
   }
 
   const choice = await onChoice(
-    `\nDo you want ai-form-agent to install these for you, or will you install them yourself?`,
+    `\nDo you want persian-form-agent to install these for you, or will you install them yourself?`,
     ["Install for me", "I'll install them myself"],
   );
 
@@ -156,7 +156,7 @@ export async function checkPeerDependencies(
   Docs: https://tailwindcss.com/docs/installation
 
 Once done, run:
-  npx ai-form-agent verify-setup
+  npx persian-form-agent verify-setup
 `);
   }
 

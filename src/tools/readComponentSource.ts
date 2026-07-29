@@ -35,7 +35,7 @@ export async function readComponentSource(
   const url = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/${ref}/${filePath}`;
 
   const response = await fetch(url, {
-    headers: { "User-Agent": "ai-form-agent" },
+    headers: { "User-Agent": "persian-form-agent" },
   });
 
   if (!response.ok) {

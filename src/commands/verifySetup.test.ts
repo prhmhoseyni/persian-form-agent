@@ -5,7 +5,7 @@ import os from "node:os";
 import { verifyTailwindSetup } from "./verifySetup.js";
 
 function createTmpDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "ai-form-agent-test-"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "persian-form-agent-test-"));
 }
 
 describe("verifyTailwindSetup", () => {

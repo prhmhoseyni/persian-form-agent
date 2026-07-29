@@ -24,7 +24,7 @@ async function fetchGitHubContents(
   const response = await fetch(url, {
     headers: {
       Accept: "application/vnd.github.v3+json",
-      "User-Agent": "ai-form-agent",
+      "User-Agent": "persian-form-agent",
     },
   });
 

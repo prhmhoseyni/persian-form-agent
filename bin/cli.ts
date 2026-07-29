@@ -9,7 +9,7 @@ import { runVerifySetup } from "../src/commands/verifySetup.js";
 const program = new Command();
 
 program
-  .name("ai-form-agent")
+  .name("persian-form-agent")
   .description("CLI tool that uses Claude to generate React forms from Persian text descriptions")
   .version("0.1.0");
 

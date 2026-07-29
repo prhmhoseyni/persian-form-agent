@@ -12,7 +12,7 @@ import {
 import type { PackageManager } from "./checkPeerDependencies.js";
 
 function createTmpDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "ai-form-agent-test-"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "persian-form-agent-test-"));
 }
 
 describe("detectPackageManager", () => {
