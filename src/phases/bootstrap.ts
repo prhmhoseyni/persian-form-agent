@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { promptChoice, checkPeerDependencies } from "./checkPeerDependencies.js";
 
 export interface AgentConfig {
   $schema: string;
@@ -89,8 +90,22 @@ export async function bootstrap(projectRoot: string): Promise<void> {
   };
 
   fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n");
-  console.log(`Created agent.config.json at ${configPath}`);
+  console.log(`✔ agent.config.json created`);
 
   ensureGitignore(projectRoot);
-  console.log("Ensured .cache/ is in .gitignore");
+  console.log("✔ .gitignore updated");
+
+  // Step 1: Ask which validation library to use
+  const libChoice = await promptChoice(
+    "Which validation library do you want to use?",
+    ["yup", "zod"],
+  );
+  const validationLib = libChoice === 2 ? "zod" : "yup";
+
+  // Update config with chosen validation library
+  config.validationLibrary = validationLib;
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n");
+
+  // Step 2 & on: check & install peer dependencies
+  await checkPeerDependencies(validationLib, projectRoot);
 }

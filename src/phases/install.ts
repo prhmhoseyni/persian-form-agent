@@ -4,6 +4,7 @@ import { parseAnalysisMarkdown } from "../parsers/analysisMarkdown.js";
 import type { AgentConfig } from "./bootstrap.js";
 import { installComponents } from "./installComponents.js";
 import { generateCode } from "./generateCode.js";
+import { verifyTailwindSetup } from "../commands/verifySetup.js";
 
 function loadConfig(projectRoot: string): AgentConfig {
   const configPath = path.join(projectRoot, "agent.config.json");
@@ -20,6 +21,16 @@ export async function implement(
   projectRoot: string,
 ): Promise<void> {
   const config = loadConfig(projectRoot);
+
+  // Gate: verify Tailwind v4 setup before generating components
+  const tailwindCheck = verifyTailwindSetup(projectRoot);
+  if (!tailwindCheck.ok) {
+    throw new Error(
+      `Cannot implement: Tailwind v4 setup is incomplete.\n` +
+        `Please add @import "tailwindcss" to your main CSS file, then run:\n` +
+        `  npx ai-form-agent verify-setup`,
+    );
+  }
 
   // Read and parse the analysis file
   const analysisPath = path.join(projectRoot, `task-${taskId}.analysis.md`);

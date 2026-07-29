@@ -4,6 +4,7 @@ import { Command } from "commander";
 import { bootstrap } from "../src/phases/bootstrap.js";
 import { analyze } from "../src/phases/analyze.js";
 import { implement } from "../src/phases/install.js";
+import { runVerifySetup } from "../src/commands/verifySetup.js";
 
 const program = new Command();
 
@@ -49,6 +50,19 @@ program
       await implement(taskId, options.path);
     } catch (err) {
       console.error("Implement failed:", err);
+      process.exit(1);
+    }
+  });
+
+program
+  .command("verify-setup")
+  .description("Check that Tailwind v4 is properly configured in the project")
+  .option("-p, --path <path>", "Target project root path", ".")
+  .action((options) => {
+    try {
+      runVerifySetup(options.path);
+    } catch (err) {
+      console.error("Verify failed:", err);
       process.exit(1);
     }
   });
