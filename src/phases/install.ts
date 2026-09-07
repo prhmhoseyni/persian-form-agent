@@ -5,6 +5,7 @@ import type { AgentConfig } from "./bootstrap.js";
 import { installComponents } from "./installComponents.js";
 import { generateCode } from "./generateCode.js";
 import { verifyTailwindSetup } from "../commands/verifySetup.js";
+import { loadEnvFiles } from "../config/env.js";
 
 function loadConfig(projectRoot: string): AgentConfig {
   const configPath = path.join(projectRoot, "agent.config.json");
@@ -20,6 +21,8 @@ export async function implement(
   taskId: string,
   projectRoot: string,
 ): Promise<void> {
+  loadEnvFiles(projectRoot);
+
   const config = loadConfig(projectRoot);
 
   // Gate: verify Tailwind v4 setup before generating components

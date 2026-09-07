@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { runToolLoop } from "../llm/client.js";
+import { loadEnvFiles } from "../config/env.js";
 import { ANALYZE_SYSTEM_PROMPT } from "../prompts/analyzeTaskPrompt.js";
 import { ANALYZE_TOOLS } from "../tools/analyzeToolDefinitions.js";
 import { createAnalyzeToolHandler } from "../tools/analyzeToolHandlers.js";
@@ -21,6 +22,9 @@ export async function analyze(
   projectRoot: string,
   options: { wizard?: boolean },
 ): Promise<void> {
+  // Load .env from the target project (and cwd) so ANTHROPIC_API_KEY is available
+  loadEnvFiles(projectRoot);
+
   // Load config
   const config = loadConfig(projectRoot);
 

@@ -5,6 +5,7 @@ import { bootstrap } from "../src/phases/bootstrap.js";
 import { analyze } from "../src/phases/analyze.js";
 import { implement } from "../src/phases/install.js";
 import { runVerifySetup } from "../src/commands/verifySetup.js";
+import { runVerifyLlm } from "../src/commands/verifyLlm.js";
 
 const program = new Command();
 
@@ -50,6 +51,19 @@ program
       await implement(taskId, options.path);
     } catch (err) {
       console.error("Implement failed:", err);
+      process.exit(1);
+    }
+  });
+
+program
+  .command("verify-llm")
+  .description("Smoke-test the configured LLM endpoint (FreeDeepseekAPI by default)")
+  .option("-p, --path <path>", "Target project root path", ".")
+  .action(async (options) => {
+    try {
+      await runVerifyLlm(options.path);
+    } catch (err) {
+      console.error("verify-llm failed:", err);
       process.exit(1);
     }
   });

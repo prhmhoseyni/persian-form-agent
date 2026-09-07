@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { resolveLlmConfig, type LlmConfig } from "../config/env.js";
 
 export interface ToolDefinition {
   name: string;
@@ -30,7 +31,49 @@ export type ToolHandler = (
   input: Record<string, unknown>,
 ) => Promise<string>;
 
-const client = new Anthropic();
+let client: Anthropic | undefined;
+let clientConfig: LlmConfig | undefined;
+
+/**
+ * Lazily construct the Anthropic SDK client, pointed at whatever
+ * Anthropic-Messages-compatible endpoint `resolveLlmConfig()` returns
+ * (by default the local FreeDeepseekAPI server).
+ */
+export function getClient(): Anthropic {
+  if (!client) {
+    clientConfig = resolveLlmConfig();
+    client = new Anthropic({
+      apiKey: clientConfig.apiKey,
+      baseURL: clientConfig.baseURL,
+    });
+  }
+  return client;
+}
+
+/** The resolved model id used for every request. */
+export function getModel(): string {
+  return (clientConfig ?? resolveLlmConfig()).model;
+}
+
+/**
+ * Send a single prompt with no tools and return the concatenated text.
+ * Used by `verify-llm` to smoke-test the endpoint.
+ */
+export async function simpleCompletion(
+  userMessage: string,
+  maxTokens = 256,
+): Promise<string> {
+  const response = await getClient().messages.create({
+    model: getModel(),
+    max_tokens: maxTokens,
+    messages: [{ role: "user", content: userMessage }],
+  });
+
+  return response.content
+    .filter((b): b is Anthropic.TextBlock => b.type === "text")
+    .map((b) => b.text)
+    .join("\n");
+}
 
 export async function runToolLoop(
   systemPrompt: string,
@@ -44,8 +87,8 @@ export async function runToolLoop(
   ];
 
   for (let i = 0; i < maxIterations; i++) {
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+    const response = await getClient().messages.create({
+      model: getModel(),
       max_tokens: 8192,
       system: systemPrompt,
       tools: tools.map((t) => ({

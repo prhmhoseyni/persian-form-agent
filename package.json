@@ -11,6 +11,7 @@
     "dev": "tsx bin/cli.ts",
     "test": "vitest run",
     "test:watch": "vitest",
+    "verify:llm": "tsx bin/cli.ts verify-llm",
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
