@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { TEMPLATES_DIR } from "./reactPersianFormRegistry.js";
 
 type Source = "local" | "react-persian-form";
 
@@ -32,7 +33,12 @@ export async function readComponentSource(
   }
 
   const { repoOwner, repoName, ref } = options.rpfConfig;
-  const url = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/${ref}/${filePath}`;
+  // Registry `files` paths are relative to the repo's `templates/` directory.
+  // Accept them with or without the prefix.
+  const normalized = filePath
+    .replace(/^\/+/, "")
+    .replace(new RegExp(`^${TEMPLATES_DIR}/`), "");
+  const url = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/${ref}/${TEMPLATES_DIR}/${normalized}`;
 
   const response = await fetch(url, {
     headers: { "User-Agent": "persian-form-agent" },

@@ -14,7 +14,7 @@ export const ANALYZE_TOOLS: ToolDefinition[] = [
   {
     name: "listReactPersianFormFiles",
     description:
-      "Returns the list of files in a given category (components/validators/utils) from the react-persian-form repo, using the local cache if fresh, otherwise fetching live from GitHub and refreshing the cache",
+      "Returns the available items in a given category from the react-persian-form component registry (registry/registry.json), using the local cache if fresh otherwise fetching from raw.githubusercontent.com. Each item is { name, description, files } where `name` is what you should put in `mappedComponent`/`mappedValidators` and `files` are paths (relative to the repo's templates/ dir) you can pass to readComponentSource. `components` lists field-input components (e.g. text, cellphone, amount); `validators` and `utils` list one item per source file with a camelCase name (e.g. cellPhoneNumber, onlyPersianCharactersAndDigits, toPersianDigits).",
     input_schema: {
       type: "object" as const,
       properties: {
@@ -29,7 +29,7 @@ export const ANALYZE_TOOLS: ToolDefinition[] = [
   {
     name: "readComponentSource",
     description:
-      "Reads the raw content of a specific component/validator/util file, either from the local project or from react-persian-form (via raw.githubusercontent.com), to inspect its props/signature/imports before committing to a match",
+      "Reads the raw content of a specific file to inspect its props/signature/imports before committing to a match. For source \"react-persian-form\", pass one of the `files` paths returned by listReactPersianFormFiles (e.g. \"components/text/text.tsx\", \"validation/yup/cell-phone-number.ts\"); the templates/ prefix is optional. For source \"local\", pass a path relative to the target project root.",
     input_schema: {
       type: "object" as const,
       properties: {

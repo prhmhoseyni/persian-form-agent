@@ -4,44 +4,73 @@ import {
   writeCache,
   isCacheFresh,
   type RpfListingCache,
+  type RpfListingItem,
 } from "../cache/rpfListingCache.js";
+import { fetchRegistry, type RegistryEntry } from "./reactPersianFormRegistry.js";
 
 type Category = "components" | "validators" | "utils";
 
-const CATEGORY_PATHS: Record<Category, string> = {
-  components: "src/components",
-  validators: "src/validators",
-  utils: "src/utils",
+function kebabToCamel(input: string): string {
+  return input.replace(/-([a-z0-9])/g, (_, c: string) => c.toUpperCase());
+}
+
+/** Registry entry whose `type` puts it in this analysis category. */
+const CATEGORY_TYPES: Record<Category, string[]> = {
+  components: ["component"],
+  validators: ["validation"],
+  utils: ["utils"],
 };
 
-async function fetchGitHubContents(
-  owner: string,
-  repo: string,
-  ref: string,
-  dirPath: string,
-): Promise<string[]> {
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${dirPath}?ref=${ref}`;
-  const response = await fetch(url, {
-    headers: {
-      Accept: "application/vnd.github.v3+json",
-      "User-Agent": "persian-form-agent",
-    },
-  });
+function isSourceFile(file: string): boolean {
+  const base = path.basename(file);
+  return (
+    !base.includes(".test.") &&
+    base !== "index.ts" &&
+    base !== "index.tsx" &&
+    base !== ".gitkeep"
+  );
+}
 
-  if (!response.ok) {
-    throw new Error(
-      `GitHub API error: ${response.status} ${response.statusText} for ${url}`,
-    );
+/**
+ * `components` are surfaced one item per registry entry (name = registry key).
+ * `validators` / `utils` are flattened to one item per source file, with a
+ * camelCase `name` derived from the filename so the analysis can reference
+ * e.g. `cellPhoneNumber` rather than a bundle.
+ */
+function toItems(entries: RegistryEntry[], category: Category): RpfListingItem[] {
+  const matches = entries.filter((e) =>
+    CATEGORY_TYPES[category].includes(e.type),
+  );
+
+  if (category === "components") {
+    return matches.map((e) => ({
+      name: e.key,
+      description: e.description,
+      files: e.files,
+    }));
   }
 
-  const data = (await response.json()) as Array<{
-    name: string;
-    type: string;
-  }>;
+  const items: RpfListingItem[] = [];
+  for (const entry of matches) {
+    for (const file of entry.files) {
+      if (!isSourceFile(file)) continue;
+      const stem = path.basename(file).replace(/\.[^.]+$/, "");
+      items.push({
+        name: kebabToCamel(stem),
+        description: entry.description,
+        files: [file],
+      });
+    }
+  }
+  return items;
+}
 
-  return data
-    .filter((item) => item.type === "file")
-    .map((item) => item.name);
+function buildListing(entries: RegistryEntry[]): RpfListingCache["listing"] {
+  return {
+    components: toItems(entries, "components"),
+    validators: toItems(entries, "validators"),
+    utils: toItems(entries, "utils"),
+  };
 }
 
 export async function listReactPersianFormFiles(
@@ -55,29 +84,27 @@ export async function listReactPersianFormFiles(
     };
   },
   category: Category,
-): Promise<string[]> {
+): Promise<RpfListingItem[]> {
   const cacheFullPath = path.join(projectRoot, config.cache.path);
-  let cache = readCache(cacheFullPath);
+  const cache = readCache(cacheFullPath);
 
-  if (cache && isCacheFresh(cache)) {
-    return cache.listing[category] || [];
+  if (
+    cache &&
+    isCacheFresh(cache) &&
+    cache.meta.repoOwner === config.reactPersianForm.repoOwner &&
+    cache.meta.repoName === config.reactPersianForm.repoName &&
+    cache.meta.ref === config.reactPersianForm.ref
+  ) {
+    return cache.listing[category] ?? [];
   }
 
-  // Fetch fresh data from GitHub
-  const listing: RpfListingCache["listing"] = {
-    components: [],
-    validators: [],
-    utils: [],
-  };
+  const entries = await fetchRegistry(
+    config.reactPersianForm.repoOwner,
+    config.reactPersianForm.repoName,
+    config.reactPersianForm.ref,
+  );
 
-  for (const cat of Object.keys(CATEGORY_PATHS) as Category[]) {
-    listing[cat] = await fetchGitHubContents(
-      config.reactPersianForm.repoOwner,
-      config.reactPersianForm.repoName,
-      config.reactPersianForm.ref,
-      CATEGORY_PATHS[cat],
-    );
-  }
+  const listing = buildListing(entries);
 
   const newCache: RpfListingCache = {
     meta: {
@@ -92,5 +119,5 @@ export async function listReactPersianFormFiles(
 
   writeCache(cacheFullPath, newCache);
 
-  return listing[category] || [];
+  return listing[category] ?? [];
 }

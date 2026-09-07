@@ -8,6 +8,11 @@ export interface AgentConfig {
     formComponents: string;
     formsOutput: string;
     customValidators: string;
+    /**
+     * Directory for standalone helper functions (digit conversion, formatters,
+     * validators' internals) copied from react-persian-form's `templates/utils/`.
+     */
+    utils: string;
     schemas: string;
   };
   validationLibrary: string;
@@ -19,11 +24,6 @@ export interface AgentConfig {
     repoOwner: string;
     repoName: string;
     ref: string;
-    paths: {
-      components: string;
-      validators: string;
-      utils: string;
-    };
   };
   wizardComponent: {
     importPath: string;
@@ -36,6 +36,7 @@ const DEFAULT_CONFIG: Omit<AgentConfig, "$schema"> = {
     formComponents: "src/components/form/fields",
     formsOutput: "src/features/forms",
     customValidators: "src/utils/validation/yup-extensions.ts",
+    utils: "src/utils",
     schemas: "src/schemas",
   },
   validationLibrary: "yup",
@@ -47,11 +48,6 @@ const DEFAULT_CONFIG: Omit<AgentConfig, "$schema"> = {
     repoOwner: "prhmhoseyni",
     repoName: "react-persian-form",
     ref: "main",
-    paths: {
-      components: "src/components",
-      validators: "src/validators",
-      utils: "src/utils",
-    },
   },
   wizardComponent: {
     importPath: "~/components/atoms/Wizard/Wizard",

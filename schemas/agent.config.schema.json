@@ -13,7 +13,7 @@
     "paths": {
       "type": "object",
       "description": "File system paths within the target project",
-      "required": ["formComponents", "formsOutput", "customValidators", "schemas"],
+      "required": ["formComponents", "formsOutput", "customValidators", "utils", "schemas"],
       "properties": {
         "formComponents": {
           "type": "string",
@@ -25,7 +25,11 @@
         },
         "customValidators": {
           "type": "string",
-          "description": "Path to custom Yup validator extensions file (e.g. src/utils/validation/yup-extensions.ts)"
+          "description": "Path to custom Yup validator extensions file (e.g. src/utils/validation/yup-extensions.ts). Its parent directory is where validator files copied from react-persian-form's templates/validation/ are placed."
+        },
+        "utils": {
+          "type": "string",
+          "description": "Directory for standalone helper functions copied from react-persian-form's templates/utils/ (e.g. src/utils)"
         },
         "schemas": {
           "type": "string",
@@ -56,8 +60,8 @@
     },
     "reactPersianForm": {
       "type": "object",
-      "description": "Configuration for the react-persian-form component library source",
-      "required": ["repoOwner", "repoName", "ref", "paths"],
+      "description": "Configuration for the react-persian-form component library source. Copyable source is read from the repo's component registry (registry/registry.json) and templates/ directory.",
+      "required": ["repoOwner", "repoName", "ref"],
       "properties": {
         "repoOwner": {
           "type": "string",
@@ -70,25 +74,6 @@
         "ref": {
           "type": "string",
           "description": "Git ref (branch, tag, or commit SHA) to pin for fetching files"
-        },
-        "paths": {
-          "type": "object",
-          "description": "Subdirectories within the react-persian-form repo",
-          "required": ["components", "validators", "utils"],
-          "properties": {
-            "components": {
-              "type": "string",
-              "description": "Path to components directory in the react-persian-form repo"
-            },
-            "validators": {
-              "type": "string",
-              "description": "Path to validators directory in the react-persian-form repo"
-            },
-            "utils": {
-              "type": "string",
-              "description": "Path to utils directory in the react-persian-form repo"
-            }
-          }
         }
       }
     },

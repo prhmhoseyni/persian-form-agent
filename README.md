@@ -139,6 +139,7 @@ LLM_MODEL=claude-sonnet-4-20250514
     "formComponents": "src/components/form/fields",
     "formsOutput": "src/features/forms",
     "customValidators": "src/utils/validation/yup-extensions.ts",
+    "utils": "src/utils",
     "schemas": "src/schemas"
   },
   "reactPersianForm": {

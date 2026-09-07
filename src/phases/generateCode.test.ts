@@ -16,6 +16,7 @@ const BASE_CONFIG: AgentConfig = {
     formComponents: "src/components/form/fields",
     formsOutput: "src/features/forms",
     customValidators: "src/utils/validation/yup-extensions.ts",
+    utils: "src/utils",
     schemas: "src/schemas",
   },
   validationLibrary: "yup",
@@ -24,11 +25,6 @@ const BASE_CONFIG: AgentConfig = {
     repoOwner: "prhmhoseyni",
     repoName: "react-persian-form",
     ref: "main",
-    paths: {
-      components: "src/components",
-      validators: "src/validators",
-      utils: "src/utils",
-    },
   },
   wizardComponent: {
     importPath: "~/components/atoms/Wizard/Wizard",
@@ -103,6 +99,24 @@ describe("generateCode - single-step form", () => {
     expect(content).toContain("useForm");
     expect(content).toContain("useYupValidationResolver");
     expect(content).toContain("yup.object");
+
+    // components: named import (the generic, non-memo export), PascalCase
+    // binding, path relative to formsOutput
+    expect(content).toContain(
+      'import { Text } from "../../components/form/fields/Text";',
+    );
+    expect(content).toContain(
+      'import { Cellphone } from "../../components/form/fields/Cellphone";',
+    );
+    expect(content).toContain("<Text ");
+    expect(content).toContain("<Cellphone ");
+    expect(content).not.toContain('import { text }');
+    // resolver comes from the installed validation bundle, not the Wizard path
+    expect(content).toContain(
+      'import { useYupValidationResolver } from "../../utils/validation/yup";',
+    );
+    // no stale React import (jsx: react-jsx)
+    expect(content).not.toContain('from "react";');
     expect(content).toContain(".trim()");
     expect(content).toContain(".required()");
     expect(content).toContain(".max(50)");
@@ -188,9 +202,12 @@ describe("generateCode - wizard form", () => {
     expect(fs.existsSync(step0)).toBe(true);
     const step0Content = fs.readFileSync(step0, "utf-8");
     expect(step0Content).toContain("export function SelectPattern");
-    expect(step0Content).toContain("WizardStepProps");
+    expect(step0Content).toContain(
+      'import type { WizardStepProps } from "~/components/atoms/Wizard/Wizard.types";',
+    );
     expect(step0Content).toContain("unitType");
     expect(step0Content).toContain("props.dispatch(values)");
+    expect(step0Content).not.toContain('from "react";');
 
     const step1 = path.join(tmpDir, "src/features/forms/BasicInfo.tsx");
     expect(fs.existsSync(step1)).toBe(true);

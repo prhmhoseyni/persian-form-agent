@@ -97,12 +97,22 @@ describe("readLocalDeps", () => {
 });
 
 describe("getRequiredDeps", () => {
-  it("returns react-hook-form, tailwindcss, and yup for yup", () => {
-    expect(getRequiredDeps("yup")).toEqual(["react-hook-form", "tailwindcss", "yup"]);
+  it("returns react-hook-form, @hookform/resolvers, tailwindcss, and yup for yup", () => {
+    expect(getRequiredDeps("yup")).toEqual([
+      "react-hook-form",
+      "@hookform/resolvers",
+      "tailwindcss",
+      "yup",
+    ]);
   });
 
-  it("returns react-hook-form, tailwindcss, and zod for zod", () => {
-    expect(getRequiredDeps("zod")).toEqual(["react-hook-form", "tailwindcss", "zod"]);
+  it("returns react-hook-form, @hookform/resolvers, tailwindcss, and zod for zod", () => {
+    expect(getRequiredDeps("zod")).toEqual([
+      "react-hook-form",
+      "@hookform/resolvers",
+      "tailwindcss",
+      "zod",
+    ]);
   });
 });
 
@@ -150,6 +160,7 @@ describe("checkPeerDependencies", () => {
       JSON.stringify({
         dependencies: {
           "react-hook-form": "^7.0.0",
+          "@hookform/resolvers": "^3.0.0",
           tailwindcss: "^4.0.0",
           yup: "^1.0.0",
         },
@@ -168,6 +179,7 @@ describe("checkPeerDependencies", () => {
       JSON.stringify({
         dependencies: {
           "react-hook-form": "^7.0.0",
+          "@hookform/resolvers": "^3.0.0",
           tailwindcss: "^4.0.0",
           zod: "^3.0.0",
         },

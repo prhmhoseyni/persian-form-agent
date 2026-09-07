@@ -34,12 +34,12 @@ export function createAnalyzeToolHandler(
           | "components"
           | "validators"
           | "utils";
-        const files = await listReactPersianFormFiles(
+        const items = await listReactPersianFormFiles(
           projectRoot,
           config,
           category,
         );
-        return JSON.stringify({ files });
+        return JSON.stringify({ category, items });
       }
 
       case "readComponentSource": {

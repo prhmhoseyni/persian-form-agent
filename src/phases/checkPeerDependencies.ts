@@ -40,7 +40,15 @@ export function readLocalDeps(projectRoot: string): Set<string> {
 }
 
 export function getRequiredDeps(validationLibrary: string): string[] {
-  return ["react-hook-form", "tailwindcss", validationLibrary];
+  // react-hook-form + the resolver adapter are needed by every generated form;
+  // @hookform/resolvers is what the react-persian-form validation bundle
+  // (installed on `implement`) imports as `@hookform/resolvers/<lib>`.
+  return [
+    "react-hook-form",
+    "@hookform/resolvers",
+    "tailwindcss",
+    validationLibrary,
+  ];
 }
 
 export function promptChoice(question: string, options: string[]): Promise<number> {

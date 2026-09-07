@@ -2,6 +2,67 @@ import fs from "node:fs";
 import path from "node:path";
 import type { AnalysisData, FormField, WizardStep } from "../types.js";
 import type { AgentConfig } from "./bootstrap.js";
+import { validationBundleDir } from "./installComponents.js";
+
+function toPosix(p: string): string {
+  return p.replace(/\\/g, "/").replace(/\/+$/, "");
+}
+
+/** `text` → `Text`, `cell-phone` → `CellPhone`; already-cased names pass through. */
+function toPascalCase(input: string): string {
+  return input.replace(
+    /(^|[-_/\s])([a-z0-9])/g,
+    (_, __, c: string) => c.toUpperCase(),
+  );
+}
+
+/** A `./`- or `../`-prefixed posix import specifier from `fromDir` to `toPath`. */
+function relImport(fromDir: string, toPath: string): string {
+  let rel = path.posix.relative(toPosix(fromDir), toPosix(toPath));
+  if (!rel.startsWith(".")) rel = `./${rel}`;
+  return rel;
+}
+
+/** JSX/import binding name for a field's component. */
+function componentBinding(field: FormField): string {
+  return toPascalCase(field.mappedComponent as string);
+}
+
+/**
+ * `{ binding → import specifier }` for every mapped component in `fields`.
+ * Components resolve to `<formComponents>/<name>` — the react-persian-form
+ * registry lays each one out as `<name>/index.ts` that re-exports both a
+ * `memo()`-wrapped default and the raw generic under its PascalCase name. We
+ * import the **named** one: `memo()` erases the `<T extends FieldValues>`
+ * parameter, so the default export won't accept a typed `Control<FormVo>`.
+ */
+function componentImports(
+  fields: FormField[],
+  config: AgentConfig,
+): Map<string, string> {
+  const out = new Map<string, string>();
+  for (const field of fields) {
+    if (!field.mappedComponent) continue;
+    out.set(
+      componentBinding(field),
+      field.customComponentPath ??
+        relImport(
+          config.paths.formsOutput,
+          path.posix.join(
+            toPosix(config.paths.formComponents),
+            field.mappedComponent,
+          ),
+        ),
+    );
+  }
+  return out;
+}
+
+function renderComponentImports(imports: Map<string, string>): string[] {
+  return [...imports].map(
+    ([name, spec]) => `import { ${name} } from "${spec}";`,
+  );
+}
 
 function buildYupValidatorChain(field: FormField): string {
   const parts: string[] = [];
@@ -54,7 +115,7 @@ function buildComponentJsx(field: FormField): string {
   if (!field.mappedComponent) {
     return `{/* TODO: ${field.name} — component unresolved */}`;
   }
-  return `<${field.mappedComponent} label="${field.label}" name="${field.name}" control={formMethods.control} />`;
+  return `<${componentBinding(field)} label="${field.label}" name="${field.name}" control={formMethods.control} />`;
 }
 
 function generateSingleStepForm(
@@ -64,22 +125,16 @@ function generateSingleStepForm(
   const step = analysis.steps[0];
   const fields = step.fields;
 
-  // Collect imports
-  const componentImports = new Set<string>();
-  for (const field of fields) {
-    if (field.mappedComponent) {
-      componentImports.add(field.mappedComponent);
-    }
-  }
+  const resolverImport = relImport(
+    config.paths.formsOutput,
+    validationBundleDir(config),
+  );
 
   const imports = [
-    `import React from "react";`,
     `import { useForm } from "react-hook-form";`,
-    `import { useYupValidationResolver } from "${config.wizardComponent.importPath.replace(/Wizard$/, "useYupValidationResolver")}";`,
+    `import { useYupValidationResolver } from "${resolverImport}";`,
     `import * as yup from "yup";`,
-    ...Array.from(componentImports).map(
-      (c) => `import { ${c} } from "${config.paths.formComponents}/${c}";`,
-    ),
+    ...renderComponentImports(componentImports(fields, config)),
   ];
 
   // Build yup schema
@@ -134,22 +189,17 @@ function generateWizardStep(
     step.componentName || `${analysis.formName}Step${step.stepIndex}`;
   const fields = step.fields;
 
-  const componentImports = new Set<string>();
-  for (const field of fields) {
-    if (field.mappedComponent) {
-      componentImports.add(field.mappedComponent);
-    }
-  }
+  const resolverImport = relImport(
+    config.paths.formsOutput,
+    validationBundleDir(config),
+  );
 
   const imports = [
-    `import React from "react";`,
     `import { useForm } from "react-hook-form";`,
-    `import { useYupValidationResolver } from "${config.wizardComponent.importPath.replace(/Wizard$/, "useYupValidationResolver")}";`,
-    `import { WizardStepProps } from "${config.wizardComponent.typesImportPath}";`,
+    `import { useYupValidationResolver } from "${resolverImport}";`,
+    `import type { WizardStepProps } from "${config.wizardComponent.typesImportPath}";`,
     `import * as yup from "yup";`,
-    ...Array.from(componentImports).map(
-      (c) => `import { ${c } } from "${config.paths.formComponents}/${c}";`,
-    ),
+    ...renderComponentImports(componentImports(fields, config)),
   ];
 
   const formVoType = `${analysis.formName}FormVo`;
@@ -208,8 +258,7 @@ function generateWizardParent(
     return `    { component: ${name} }`;
   });
 
-  return `import React from "react";
-import Wizard from "${config.wizardComponent.importPath}";
+  return `import Wizard from "${config.wizardComponent.importPath}";
 
 ${stepImports.join("\n")}
 
