@@ -12,6 +12,10 @@ import {
   detectPackageManager,
   buildInstallCommand,
 } from "./checkPeerDependencies.js";
+import {
+  importSpecifier,
+  type ImportAlias,
+} from "../tools/detectImportAlias.js";
 
 interface InstallationLogEntry {
   taskId: string;
@@ -104,14 +108,19 @@ export function mapTemplatePathToLocal(
 /**
  * Rewrite the relative import specifiers in a fetched file so they still
  * resolve once the `templates/` tree has been split across the project's
- * configured directories. Imports that stay within the same prefix are
- * unchanged; cross-prefix imports (component → utils, validator → utils) are
- * repointed. Non-relative and unmappable specifiers are left untouched.
+ * configured directories.
+ *
+ * With an `alias`, every mapped import becomes `<alias>/…` (files are then
+ * freely relocatable). Without one, cross-prefix imports (component → utils,
+ * validator → utils) are repointed to the right relative depth and
+ * same-prefix imports are left as-is. Non-relative and unmappable specifiers
+ * are always left untouched.
  */
 export function rewriteRelativeImports(
   content: string,
   srcTemplatePath: string,
   layout: LocalLayout,
+  alias?: ImportAlias | null,
 ): string {
   const srcLocal = mapTemplatePathToLocal(srcTemplatePath, layout);
   if (!srcLocal) return content;
@@ -126,9 +135,8 @@ export function rewriteRelativeImports(
       const targetLocal = mapTemplatePathToLocal(targetTpl, layout);
       if (!targetLocal) return whole;
 
-      let rel = path.posix.relative(srcLocalDir, targetLocal);
-      if (!rel.startsWith(".")) rel = `./${rel}`;
-      return `${keyword}${quote}${rel}${quote}`;
+      const next = importSpecifier(alias, targetLocal, srcLocalDir);
+      return `${keyword}${quote}${next}${quote}`;
     },
   );
 }
@@ -284,6 +292,7 @@ export async function installComponents(
   for (const w of resolveWarnings) console.warn(`  ⚠ ${w}`);
 
   const layout = resolveLocalLayout(config);
+  const alias = config.importAlias ?? null;
   const index = buildIndex(entries);
 
   const installedFiles: string[] = [];
@@ -315,7 +324,7 @@ export async function installComponents(
         projectRoot,
         rpfConfig: config.reactPersianForm,
       });
-      const content = rewriteRelativeImports(raw, file, layout);
+      const content = rewriteRelativeImports(raw, file, layout, alias);
 
       fs.mkdirSync(path.dirname(fullLocalPath), { recursive: true });
       fs.writeFileSync(fullLocalPath, content);

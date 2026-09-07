@@ -3,6 +3,7 @@ import path from "node:path";
 import type { AnalysisData, FormField, WizardStep } from "../types.js";
 import type { AgentConfig } from "./bootstrap.js";
 import { validationBundleDir } from "./installComponents.js";
+import { importSpecifier } from "../tools/detectImportAlias.js";
 
 function toPosix(p: string): string {
   return p.replace(/\\/g, "/").replace(/\/+$/, "");
@@ -16,11 +17,17 @@ function toPascalCase(input: string): string {
   );
 }
 
-/** A `./`- or `../`-prefixed posix import specifier from `fromDir` to `toPath`. */
-function relImport(fromDir: string, toPath: string): string {
-  let rel = path.posix.relative(toPosix(fromDir), toPosix(toPath));
-  if (!rel.startsWith(".")) rel = `./${rel}`;
-  return rel;
+/**
+ * Import specifier for a project file `target` (project-root relative), used
+ * from the forms-output directory: the configured `importAlias` when it covers
+ * the target, otherwise a `./`-/`../`-prefixed relative path.
+ */
+function localImport(config: AgentConfig, target: string): string {
+  return importSpecifier(
+    config.importAlias,
+    toPosix(target),
+    toPosix(config.paths.formsOutput),
+  );
 }
 
 /** JSX/import binding name for a field's component. */
@@ -46,8 +53,8 @@ function componentImports(
     out.set(
       componentBinding(field),
       field.customComponentPath ??
-        relImport(
-          config.paths.formsOutput,
+        localImport(
+          config,
           path.posix.join(
             toPosix(config.paths.formComponents),
             field.mappedComponent,
@@ -125,10 +132,7 @@ function generateSingleStepForm(
   const step = analysis.steps[0];
   const fields = step.fields;
 
-  const resolverImport = relImport(
-    config.paths.formsOutput,
-    validationBundleDir(config),
-  );
+  const resolverImport = localImport(config, validationBundleDir(config));
 
   const imports = [
     `import { useForm } from "react-hook-form";`,
@@ -189,10 +193,7 @@ function generateWizardStep(
     step.componentName || `${analysis.formName}Step${step.stepIndex}`;
   const fields = step.fields;
 
-  const resolverImport = relImport(
-    config.paths.formsOutput,
-    validationBundleDir(config),
-  );
+  const resolverImport = localImport(config, validationBundleDir(config));
 
   const imports = [
     `import { useForm } from "react-hook-form";`,

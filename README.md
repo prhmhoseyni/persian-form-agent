@@ -142,6 +142,7 @@ LLM_MODEL=claude-sonnet-4-20250514
     "utils": "src/utils",
     "schemas": "src/schemas"
   },
+  "importAlias": { "prefix": "~", "base": "src" },
   "reactPersianForm": {
     "repoOwner": "prhmhoseyni",
     "repoName": "react-persian-form",
@@ -149,6 +150,20 @@ LLM_MODEL=claude-sonnet-4-20250514
   }
 }
 ```
+
+### Import alias
+
+`init` inspects your `tsconfig.json` / `jsconfig.json` (following `extends` and
+project `references`) for an absolute-import path such as `"~/*": ["src/*"]`.
+When it finds one that covers the generated directories — and, under Vite, that
+`vite-tsconfig-paths` or a matching `resolve.alias` actually resolves it — it
+records it as `importAlias` and every generated form and copied component
+imports through it (`import { Text } from "~/components/form/fields/text"`).
+
+With `importAlias` set to `null` (the default when nothing is detected),
+generated code uses relative paths instead. The tool never edits your
+`tsconfig` or bundler config to add an alias — set one up yourself and re-run
+`init`, or add `importAlias` to `agent.config.json` by hand.
 
 ## Cache
 

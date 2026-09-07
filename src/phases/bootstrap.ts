@@ -1,6 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { promptChoice, checkPeerDependencies } from "./checkPeerDependencies.js";
+import {
+  detectImportAlias,
+  type ImportAlias,
+} from "../tools/detectImportAlias.js";
 
 export interface AgentConfig {
   $schema: string;
@@ -15,6 +19,11 @@ export interface AgentConfig {
     utils: string;
     schemas: string;
   };
+  /**
+   * Absolute-import alias for generated/installed code, detected from the
+   * project's tsconfig on `init`. `null` → generated imports are relative.
+   */
+  importAlias?: ImportAlias | null;
   validationLibrary: string;
   cache: {
     path: string;
@@ -39,6 +48,7 @@ const DEFAULT_CONFIG: Omit<AgentConfig, "$schema"> = {
     utils: "src/utils",
     schemas: "src/schemas",
   },
+  importAlias: null,
   validationLibrary: "yup",
   cache: {
     path: ".cache/rpf-listing.json",
@@ -84,6 +94,20 @@ export async function bootstrap(projectRoot: string): Promise<void> {
     $schema: SCHEMA_URL,
     ...DEFAULT_CONFIG,
   };
+
+  // Detect an existing absolute-import alias so generated code can use it.
+  config.importAlias = detectImportAlias(projectRoot, config.paths.formComponents);
+  if (config.importAlias) {
+    const { prefix, base } = config.importAlias;
+    console.log(
+      `✔ Import alias detected: "${prefix}/*" → ${base ? `${base}/` : "./"} (generated imports will use it)`,
+    );
+  } else {
+    console.log(
+      '• No import alias detected — generated imports will be relative. ' +
+        'Add a "~/*" tsconfig path (and vite-tsconfig-paths under Vite) to change that.',
+    );
+  }
 
   fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n");
   console.log(`✔ agent.config.json created`);

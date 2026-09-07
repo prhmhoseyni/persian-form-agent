@@ -37,6 +37,21 @@
         }
       }
     },
+    "importAlias": {
+      "type": ["object", "null"],
+      "description": "Absolute-import alias for generated/installed code, detected from the project's tsconfig on `init`. Null (or absent) means generated imports are relative.",
+      "required": ["prefix", "base"],
+      "properties": {
+        "prefix": {
+          "type": "string",
+          "description": "Alias prefix without the trailing /* (e.g. \"~\" for a \"~/*\" path)"
+        },
+        "base": {
+          "type": "string",
+          "description": "Directory the alias resolves to, relative to the project root; \"\" means the project root"
+        }
+      }
+    },
     "validationLibrary": {
       "type": "string",
       "description": "Validation library to use (currently only 'yup' is supported)",

@@ -49,6 +49,7 @@ const CONFIG: AgentConfig = {
     utils: "src/utils",
     schemas: "src/schemas",
   },
+  importAlias: null,
   validationLibrary: "yup",
   cache: { path: ".cache/rpf-listing.json", ttlHours: 24 },
   reactPersianForm: {
@@ -244,6 +245,18 @@ describe("rewriteRelativeImports", () => {
     );
     expect(out).toContain(`import "./cell-phone-number"`);
   });
+
+  it("rewrites every mapped import to the alias when one is given", () => {
+    const out = rewriteRelativeImports(
+      FILES["components/text/text.tsx"],
+      "components/text/text.tsx",
+      layout,
+      { prefix: "~", base: "src" },
+    );
+    expect(out).toContain(`from "~/utils/to-persian-digits"`);
+    expect(out).toContain(`from "~/components/form/fields/_core/formatter"`);
+    expect(out).not.toContain("../");
+  });
 });
 
 describe("collectRegistryKeys", () => {
@@ -414,6 +427,30 @@ describe("installComponents", () => {
     expect(log[0].registryKeys).toContain("utils");
     expect(log[0].npmDependencies).toContain("react-hook-form");
     expect(log[0].npmDependencies).toContain("clsx");
+  });
+
+  it("rewrites copied-file imports to the alias when config.importAlias is set", async () => {
+    const analysis = analysisWith([
+      field({
+        name: "firstName",
+        mappedComponent: "text",
+        componentSource: "react-persian-form",
+        componentStatus: "needs-installation",
+        mappedValidators: ["required"],
+      }),
+    ]);
+
+    await installComponents(
+      analysis,
+      { ...CONFIG, importAlias: { prefix: "~", base: "src" } },
+      tmp,
+      "42a",
+    );
+
+    const text = read("src/components/form/fields/text/text.tsx");
+    expect(text).toContain(`from "~/utils/to-persian-digits"`);
+    expect(text).toContain(`from "~/components/form/fields/_core/formatter"`);
+    expect(text).not.toContain("../");
   });
 
   it("also installs the validation bundle when a custom validator is used", async () => {

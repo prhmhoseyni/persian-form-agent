@@ -19,6 +19,7 @@ const BASE_CONFIG: AgentConfig = {
     utils: "src/utils",
     schemas: "src/schemas",
   },
+  importAlias: null,
   validationLibrary: "yup",
   cache: { path: ".cache/rpf-listing.json", ttlHours: 24 },
   reactPersianForm: {
@@ -131,6 +132,54 @@ describe("generateCode - single-step form", () => {
     expect(typesContent).toContain("export interface RegistrationFormFormVo");
     expect(typesContent).toContain("firstName: string");
     expect(typesContent).toContain("cellphone: string");
+  });
+
+  it("uses the configured import alias when present", () => {
+    const analysis: AnalysisData = {
+      taskId: "123",
+      formName: "RegistrationForm",
+      formType: "single",
+      overallStatus: "ready",
+      steps: [
+        {
+          stepIndex: 0,
+          fields: [
+            {
+              name: "firstName",
+              label: "نام",
+              required: true,
+              nameSource: "explicit-in-task",
+              mappedComponent: "Text",
+              componentSource: "react-persian-form",
+              componentStatus: "needs-installation",
+              mappedValidators: ["required"],
+              rawRule: "",
+              confidence: "high",
+              warnings: [],
+              customComponentPath: null,
+            },
+          ],
+        },
+      ],
+    };
+
+    generateCode(
+      analysis,
+      { ...BASE_CONFIG, importAlias: { prefix: "~", base: "src" } },
+      tmpDir,
+    );
+
+    const content = fs.readFileSync(
+      path.join(tmpDir, "src/features/forms/RegistrationForm.tsx"),
+      "utf-8",
+    );
+    expect(content).toContain(
+      'import { Text } from "~/components/form/fields/Text";',
+    );
+    expect(content).toContain(
+      'import { useYupValidationResolver } from "~/utils/validation/yup";',
+    );
+    expect(content).not.toContain("../../");
   });
 });
 
