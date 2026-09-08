@@ -51,15 +51,15 @@ const CONFIG: AgentConfig = {
   },
   importAlias: null,
   validationLibrary: "yup",
-  cache: { path: ".cache/rpf-listing.json", ttlHours: 24 },
+  cache: { path: ".cache/persian-form-agent.rpf-listing.json", ttlHours: 24 },
   reactPersianForm: {
     repoOwner: "prhmhoseyni",
     repoName: "react-persian-form",
     ref: "main",
   },
   wizardComponent: {
-    importPath: "~/components/atoms/Wizard/Wizard",
-    typesImportPath: "~/components/atoms/Wizard/Wizard.types",
+    importPath: "~/components/wizard/Wizard",
+    typesImportPath: "~/components/wizard/Wizard.types",
   },
 };
 
@@ -420,7 +420,7 @@ describe("installComponents", () => {
       `from "../_core/formatter"`,
     );
 
-    const log = JSON.parse(read("installation-log.json"));
+    const log = JSON.parse(read("persian-form-agent.installation-log.json"));
     expect(log).toHaveLength(1);
     expect(log[0].taskId).toBe("42");
     expect(log[0].registryKeys).toContain("text");
@@ -484,7 +484,7 @@ describe("installComponents", () => {
     expect(exists("src/utils/validation/yup/index.ts")).toBe(true);
     expect(exists("src/components/form/fields/text/text.tsx")).toBe(false);
 
-    const log = JSON.parse(read("installation-log.json"));
+    const log = JSON.parse(read("persian-form-agent.installation-log.json"));
     expect(log[0].registryKeys).toContain("validation-yup");
     expect(log[0].registryKeys).not.toContain("text");
   });
@@ -496,7 +496,7 @@ describe("installComponents", () => {
       tmp,
       "44b",
     );
-    expect(exists("installation-log.json")).toBe(false);
+    expect(exists("persian-form-agent.installation-log.json")).toBe(false);
     expect(readComponentSourceMock).not.toHaveBeenCalled();
   });
 
@@ -520,7 +520,7 @@ describe("installComponents", () => {
       "utils/to-persian-digits.ts",
       expect.anything(),
     );
-    const log = JSON.parse(read("installation-log.json"));
+    const log = JSON.parse(read("persian-form-agent.installation-log.json"));
     expect(log[0].files).toContain("src/utils/to-persian-digits.ts");
   });
 
@@ -534,7 +534,7 @@ describe("installComponents", () => {
     ]);
     await installComponents(analysis, CONFIG, tmp, "46");
     await installComponents(analysis, CONFIG, tmp, "47");
-    const log = JSON.parse(read("installation-log.json"));
+    const log = JSON.parse(read("persian-form-agent.installation-log.json"));
     expect(log).toHaveLength(2);
     expect(log.map((e: { taskId: string }) => e.taskId)).toEqual(["46", "47"]);
   });

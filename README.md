@@ -18,7 +18,7 @@ Given a plain-text Persian description of a form, `persian-form-agent` produces:
 ## How it works
 
 ```
-Phase 0: Bootstrap     → agent.config.json
+Phase 0: Bootstrap     → persian-form-agent.config.json
 Phase 1: Analyze       → task-{id}.analysis.md (LLM-powered)
 Phase 2: Review        → developer edits the .md file
 Phase 3: Implement     → installs deps + generates code
@@ -40,7 +40,7 @@ npx persian-form-agent init
 npx persian-form-agent init
 ```
 
-Creates `agent.config.json` in your project root with paths and configuration.
+Creates `persian-form-agent.config.json` in your project root with paths and configuration.
 
 ### 2. Write a task description
 
@@ -106,7 +106,7 @@ API–compatible** endpoint, and defaults to a local FreeDeepseekAPI server.
 ### Configure via environment / `.env`
 
 Copy [`.env.example`](.env.example) to `.env` in your target project root
-(next to `agent.config.json`) and adjust:
+(next to `persian-form-agent.config.json`) and adjust:
 
 ```bash
 LLM_BASE_URL=http://127.0.0.1:9655
@@ -130,11 +130,11 @@ LLM_MODEL=claude-sonnet-4-20250514
 
 ## Configuration
 
-`agent.config.json`:
+`persian-form-agent.config.json`:
 
 ```json
 {
-  "$schema": "https://raw.githubusercontent.com/prhmhoseyni/persian-form-agent/main/schemas/agent.config.schema.json",
+  "$schema": "https://raw.githubusercontent.com/prhmhoseyni/persian-form-agent/main/schemas/persian-form-agent.config.schema.json",
   "paths": {
     "formComponents": "src/components/form/fields",
     "formsOutput": "src/features/forms",
@@ -163,11 +163,15 @@ imports through it (`import { Text } from "~/components/form/fields/text"`).
 With `importAlias` set to `null` (the default when nothing is detected),
 generated code uses relative paths instead. The tool never edits your
 `tsconfig` or bundler config to add an alias — set one up yourself and re-run
-`init`, or add `importAlias` to `agent.config.json` by hand.
+`init`, or add `importAlias` to `persian-form-agent.config.json` by hand.
 
 ## Cache
 
-File listings from react-persian-form are cached at `.cache/rpf-listing.json` (24h TTL). To invalidate, delete the file.
+File listings from react-persian-form are cached at `.cache/persian-form-agent.rpf-listing.json` (24h TTL). To invalidate, delete the file.
+
+Files persian-form-agent writes into your project root are all prefixed
+`persian-form-agent.` — `persian-form-agent.config.json` and, after `implement`,
+`persian-form-agent.installation-log.json`.
 
 ## License
 

@@ -2,20 +2,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { runToolLoop } from "../llm/client.js";
 import { loadEnvFiles } from "../config/env.js";
+import { loadConfig } from "../config/agentConfig.js";
 import { ANALYZE_SYSTEM_PROMPT } from "../prompts/analyzeTaskPrompt.js";
 import { ANALYZE_TOOLS } from "../tools/analyzeToolDefinitions.js";
 import { createAnalyzeToolHandler } from "../tools/analyzeToolHandlers.js";
-import type { AgentConfig } from "./bootstrap.js";
-
-function loadConfig(projectRoot: string): AgentConfig {
-  const configPath = path.join(projectRoot, "agent.config.json");
-  if (!fs.existsSync(configPath)) {
-    throw new Error(
-      "agent.config.json not found. Run `persian-form-agent init` first.",
-    );
-  }
-  return JSON.parse(fs.readFileSync(configPath, "utf-8"));
-}
 
 export async function analyze(
   inputFile: string,

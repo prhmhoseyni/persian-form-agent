@@ -21,15 +21,15 @@ const BASE_CONFIG: AgentConfig = {
   },
   importAlias: null,
   validationLibrary: "yup",
-  cache: { path: ".cache/rpf-listing.json", ttlHours: 24 },
+  cache: { path: ".cache/persian-form-agent.rpf-listing.json", ttlHours: 24 },
   reactPersianForm: {
     repoOwner: "prhmhoseyni",
     repoName: "react-persian-form",
     ref: "main",
   },
   wizardComponent: {
-    importPath: "~/components/atoms/Wizard/Wizard",
-    typesImportPath: "~/components/atoms/Wizard/Wizard.types",
+    importPath: "~/components/wizard/Wizard",
+    typesImportPath: "~/components/wizard/Wizard.types",
   },
 };
 
@@ -252,7 +252,7 @@ describe("generateCode - wizard form", () => {
     const step0Content = fs.readFileSync(step0, "utf-8");
     expect(step0Content).toContain("export function SelectPattern");
     expect(step0Content).toContain(
-      'import type { WizardStepProps } from "~/components/atoms/Wizard/Wizard.types";',
+      'import type { WizardStepProps } from "~/components/wizard/Wizard.types";',
     );
     expect(step0Content).toContain("unitType");
     expect(step0Content).toContain("props.dispatch(values)");

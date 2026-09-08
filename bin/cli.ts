@@ -16,7 +16,9 @@ program
 
 program
   .command("init")
-  .description("Phase 0: Create agent.config.json in the target project")
+  .description(
+    "Phase 0: Create persian-form-agent.config.json in the target project",
+  )
   .option("-p, --path <path>", "Target project root path", ".")
   .action(async (options) => {
     try {

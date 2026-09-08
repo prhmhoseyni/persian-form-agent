@@ -5,6 +5,11 @@ import {
   detectImportAlias,
   type ImportAlias,
 } from "../tools/detectImportAlias.js";
+import {
+  CONFIG_FILENAME,
+  CONFIG_SCHEMA_URL,
+  DEFAULT_CACHE_PATH,
+} from "../config/agentConfig.js";
 
 export interface AgentConfig {
   $schema: string;
@@ -51,7 +56,7 @@ const DEFAULT_CONFIG: Omit<AgentConfig, "$schema"> = {
   importAlias: null,
   validationLibrary: "yup",
   cache: {
-    path: ".cache/rpf-listing.json",
+    path: DEFAULT_CACHE_PATH,
     ttlHours: 24,
   },
   reactPersianForm: {
@@ -60,13 +65,10 @@ const DEFAULT_CONFIG: Omit<AgentConfig, "$schema"> = {
     ref: "main",
   },
   wizardComponent: {
-    importPath: "~/components/atoms/Wizard/Wizard",
-    typesImportPath: "~/components/atoms/Wizard/Wizard.types",
+    importPath: "~/components/wizard/Wizard",
+    typesImportPath: "~/components/wizard/Wizard.types",
   },
 };
-
-const SCHEMA_URL =
-  "https://raw.githubusercontent.com/prhmhoseyni/persian-form-agent/main/schemas/agent.config.schema.json";
 
 function ensureGitignore(projectRoot: string): void {
   const gitignorePath = path.join(projectRoot, ".gitignore");
@@ -83,15 +85,18 @@ function ensureGitignore(projectRoot: string): void {
 }
 
 export async function bootstrap(projectRoot: string): Promise<void> {
-  const configPath = path.join(projectRoot, "agent.config.json");
+  const configPath = path.join(projectRoot, CONFIG_FILENAME);
 
-  if (fs.existsSync(configPath)) {
-    console.log(`agent.config.json already exists at ${configPath}, skipping.`);
-    return;
+  for (const name of [CONFIG_FILENAME, "agent.config.json"]) {
+    const existing = path.join(projectRoot, name);
+    if (fs.existsSync(existing)) {
+      console.log(`${name} already exists at ${existing}, skipping.`);
+      return;
+    }
   }
 
   const config: AgentConfig = {
-    $schema: SCHEMA_URL,
+    $schema: CONFIG_SCHEMA_URL,
     ...DEFAULT_CONFIG,
   };
 
@@ -110,7 +115,7 @@ export async function bootstrap(projectRoot: string): Promise<void> {
   }
 
   fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n");
-  console.log(`✔ agent.config.json created`);
+  console.log(`✔ ${CONFIG_FILENAME} created`);
 
   ensureGitignore(projectRoot);
   console.log("✔ .gitignore updated");

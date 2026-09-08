@@ -16,6 +16,7 @@ import {
   importSpecifier,
   type ImportAlias,
 } from "../tools/detectImportAlias.js";
+import { INSTALLATION_LOG_FILENAME } from "../config/agentConfig.js";
 
 interface InstallationLogEntry {
   taskId: string;
@@ -31,7 +32,7 @@ interface InstallationLogEntry {
 
 /**
  * Where each `templates/<prefix>/…` tree lands inside the target project.
- * Derived from `agent.config.json` `paths`.
+ * Derived from `persian-form-agent.config.json` `paths`.
  */
 export interface LocalLayout {
   /** `templates/components/**` → here (posix, project-relative). */
@@ -333,7 +334,7 @@ export async function installComponents(
     }
   }
 
-  const logPath = path.join(projectRoot, "installation-log.json");
+  const logPath = path.join(projectRoot, INSTALLATION_LOG_FILENAME);
   const log: InstallationLogEntry[] = fs.existsSync(logPath)
     ? JSON.parse(fs.readFileSync(logPath, "utf-8"))
     : [];
@@ -371,5 +372,5 @@ export async function installComponents(
     }
   }
 
-  console.log("See installation-log.json for details.");
+  console.log(`See ${INSTALLATION_LOG_FILENAME} for details.`);
 }

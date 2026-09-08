@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://raw.githubusercontent.com/prhmhoseyni/persian-form-agent/main/schemas/agent.config.schema.json",
-  "title": "AI Form Agent Configuration",
+  "$id": "https://raw.githubusercontent.com/prhmhoseyni/persian-form-agent/main/schemas/persian-form-agent.config.schema.json",
+  "title": "persian-form-agent Configuration",
   "description": "Configuration file for the persian-form-agent CLI tool",
   "type": "object",
   "required": ["paths", "validationLibrary", "cache", "reactPersianForm", "wizardComponent"],
@@ -64,7 +64,7 @@
       "properties": {
         "path": {
           "type": "string",
-          "description": "Path to the cache file relative to the project root (e.g. .cache/rpf-listing.json)"
+          "description": "Path to the cache file relative to the project root (e.g. .cache/persian-form-agent.rpf-listing.json)"
         },
         "ttlHours": {
           "type": "number",
@@ -99,11 +99,11 @@
       "properties": {
         "importPath": {
           "type": "string",
-          "description": "Import path for the Wizard component (e.g. ~/components/atoms/Wizard/Wizard)"
+          "description": "Import path for the Wizard component (e.g. ~/components/wizard/Wizard)"
         },
         "typesImportPath": {
           "type": "string",
-          "description": "Import path for Wizard types including WizardStepProps (e.g. ~/components/atoms/Wizard/Wizard.types)"
+          "description": "Import path for Wizard types including WizardStepProps (e.g. ~/components/wizard/Wizard.types)"
         }
       }
     }

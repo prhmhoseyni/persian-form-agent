@@ -1,21 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import { parseAnalysisMarkdown } from "../parsers/analysisMarkdown.js";
-import type { AgentConfig } from "./bootstrap.js";
 import { installComponents } from "./installComponents.js";
 import { generateCode } from "./generateCode.js";
 import { verifyTailwindSetup } from "../commands/verifySetup.js";
 import { loadEnvFiles } from "../config/env.js";
-
-function loadConfig(projectRoot: string): AgentConfig {
-  const configPath = path.join(projectRoot, "agent.config.json");
-  if (!fs.existsSync(configPath)) {
-    throw new Error(
-      "agent.config.json not found. Run `persian-form-agent init` first.",
-    );
-  }
-  return JSON.parse(fs.readFileSync(configPath, "utf-8"));
-}
+import { loadConfig } from "../config/agentConfig.js";
 
 export async function implement(
   taskId: string,
